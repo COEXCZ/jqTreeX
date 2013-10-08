@@ -1,0 +1,7 @@
+.jqtree, .jqtree * {
+	@include box-sizing(border-box); /* screw it, let's do it */
+}
+
+.jqtree {	
+	@include bonsai-layout(); /* mixin for standard and touch layouts, accepts optional parameters */
+}

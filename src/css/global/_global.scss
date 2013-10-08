@@ -1,0 +1,10 @@
+@import "vars"; /* global variables */
+@import "mixins"; /* global mixins */
+
+/* ssssshhhhh, silent classes */
+%stretch {
+	max-width:none;
+	width:100%;
+}
+
+/* pst: silent classes are abstract, reusable and don't get printed unless they are used */

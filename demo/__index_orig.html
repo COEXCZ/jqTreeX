@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>tree</title>
+    <!-- <link rel="stylesheet" href="assets/css/normalize.css"> -->
+    <!-- <link rel="stylesheet" href="assets/js/vendor/jqtree/jqtree.css" /> -->
+    <!-- <link rel="stylesheet" href="assets/css/demo.css"> -->
+    <link rel="stylesheet" href="assets/css/tree.css" />
+    <!--[if lt IE 9]>
+        <script src="extra/js/jquery-1.10.2.min.js"></script>
+    <![endif]-->
+    <!--[if gte IE 9]><!-->
+        <script src="assets/js/vendor/jquery/jquery-2.0.3.min.js"></script>
+    <!--<![endif]-->
+    <script src="assets/js/vendor/modernizr.dev.js"></script>
+    <script src="assets/js/vendor/jqtree/tree.jquery.js"></script>
+
+</head>
+<body>
+
+
+<div class="js-tree jqtree bonsai"></div>
+
+<script src="assets/js/vendor/jqtree/tree.jquery.js"></script>
+
+<script>
+        var data = [
+            {
+                id: 1,
+                label: 'node1',
+                elmClass: 'icon-folder icon-doctype icon-folder-open',
+                children: [
+                    { id: 2, label: 'child1', elmClass:'icon-filetype icon-doctype icon-columns' },
+                    { id: 3, label: 'child2', elmClass:'icon-filetype icon-doctype icon-columns' }
+                ]
+            },
+            {
+                id: 4,
+                label: 'node2',
+                elmClass: 'icon-folder icon-doctype icon-folder-open',
+                children: [
+                    { id: 5, label: 'child3' }
+                ]
+            },
+            {
+                id: 6,
+                label: 'node3',
+                elmClass: 'icon-folder icon-doctype icon-folder-open',
+                children: [
+                ]
+            }
+        ];
+
+        var tree = $('.js-tree');
+
+        tree.tree({
+            data: data,
+            autoOpen: true,
+            dragAndDrop: true,
+            saveState: true,
+            closedIcon: '',
+            openedIcon: '',
+            onCreateLi: function(node, $li) {
+                
+
+                if ($li.hasClass('jqtree-folder')) {
+                    //console.log($li.hasClass('jqtree-folder'));
+                    $li.addClass('folder');
+                }
+
+                $li.find('.jqtree-title').addClass(node.elmClass);
+                $li.find('.jqtree-toggler').addClass('icon-caret-down');
+                
+
+
+                //$li.hasClass('jqtree-folder').addClass('folder');
+                /*$li.find('.jqtree-element').append(
+                    '<a href="#node-'+ node.id +'" class="edit" data-node-id="'+
+                    node.id +'">edit</a>'
+                );*/
+            }
+        });
+
+
+        // right click context menu
+        tree.bind(
+        'tree.contextmenu',
+        function(event) {
+            // The clicked node is 'event.node'
+            var node = event.node;
+            alert(node.name + ' id: '+ node.id + ' class: ' + node.elmClass);
+        });
+
+
+        tree.bind(
+            'tree.move',
+            function(event) {
+                console.log('moved_node', event.move_info.moved_node);
+                console.log('target_node', event.move_info.target_node);
+                console.log('position', event.move_info.position);
+                console.log('previous_parent', event.move_info.previous_parent);
+            }
+        );
+
+</script>
+
+</body>
+</html>
