@@ -2,21 +2,6 @@ module.exports = function(grunt) {
 
 	grunt.initConfig({
 
-		// Import package manifest
-		pkg: grunt.file.readJSON("boilerplate.jquery.json"),
-
-		// Banner definitions
-		meta: {
-			banner: "/*\n" +
-				" *  <%= pkg.title || pkg.name %> - v<%= pkg.version %>\n" +
-				" *  <%= pkg.description %>\n" +
-				" *  <%= pkg.homepage %>\n" +
-				" *\n" +
-				" *  Made by <%= pkg.author.name %>\n" +
-				" *  Under <%= pkg.licenses[0].type %> License\n" +
-				" */\n"
-		},
-
         watch: {
             coffee: {
                 files: ['src/js/{,*/}*.coffee'],
@@ -33,9 +18,6 @@ module.exports = function(grunt) {
 			dist: {
 				src: ["src/jquery.treex.js"],
 				dest: "dist/jquery.treex.js"
-			},
-			options: {
-				banner: "<%= meta.banner %>"
 			}
 		},
 
@@ -52,9 +34,6 @@ module.exports = function(grunt) {
 			my_target: {
 				src: ["dist/jquery.treex.js"],
 				dest: "dist/jquery.treex.min.js"
-			},
-			options: {
-				banner: "<%= meta.banner %>"
 			}
 		},
 
