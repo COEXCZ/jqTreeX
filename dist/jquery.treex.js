@@ -354,7 +354,7 @@ limitations under the License.
         _results = [];
         for (key in o) {
           value = o[key];
-          if (key === 'label') {
+          if (key === 'text') {
             _results.push(this.name = value);
           } else {
             _results.push(this[key] = value);

@@ -37,7 +37,7 @@ class Node
             @name = o
         else
             for key, value of o
-                if key == 'label'
+                if key == 'text'
                     # todo: node property is 'name', but we use 'label' here
                     @name = value
                 else
