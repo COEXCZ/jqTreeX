@@ -166,6 +166,14 @@ class SaveStateHandler
             open_nodes = state.open_nodes
             selected_node_id = state.selected_node
 
+            for nodeId in open_nodes
+                console.log nodeId
+                node = @tree_widget.getNodeById(nodeId)
+                @tree_widget.openNode(node) if typeof node isnt "undefined"
+                
+            
+
+            ### TO DELETE
             @tree_widget.tree.iterate((node) =>
                 node.is_open = (
                     node.id and
@@ -174,6 +182,7 @@ class SaveStateHandler
                 )
                 return true
             )
+            ###
 
             if selected_node_id and @tree_widget.select_node_handler
                 @tree_widget.select_node_handler.clear()

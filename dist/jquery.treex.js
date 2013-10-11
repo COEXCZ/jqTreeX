@@ -1873,15 +1873,29 @@ limitations under the License.
     };
 
     SaveStateHandler.prototype.setState = function(state) {
-      var open_nodes, selected_node, selected_node_id,
-        _this = this;
+      var node, nodeId, open_nodes, selected_node, selected_node_id, _i, _len;
       if (state) {
         open_nodes = state.open_nodes;
         selected_node_id = state.selected_node;
-        this.tree_widget.tree.iterate(function(node) {
-          node.is_open = node.id && node.hasChildren() && (indexOf(open_nodes, node.id) >= 0);
-          return true;
-        });
+        for (_i = 0, _len = open_nodes.length; _i < _len; _i++) {
+          nodeId = open_nodes[_i];
+          console.log(nodeId);
+          node = this.tree_widget.getNodeById(nodeId);
+          if (typeof node !== "undefined") {
+            this.tree_widget.openNode(node);
+          }
+        }
+        /* TO DELETE
+        @tree_widget.tree.iterate((node) =>
+            node.is_open = (
+                node.id and
+                node.hasChildren() and
+                (indexOf(open_nodes, node.id) >= 0)
+            )
+            return true
+        )
+        */
+
         if (selected_node_id && this.tree_widget.select_node_handler) {
           this.tree_widget.select_node_handler.clear();
           selected_node = this.tree_widget.getNodeById(selected_node_id);
