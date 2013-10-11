@@ -397,16 +397,18 @@ class JqTreeWidget extends MouseWidget
         getUrlFromString = =>
             url_info = url: data_url
 
+            data = action: 'web/resource/getnodes'
+
             if node and node.id
                 # Load on demand of a subtree; add node parameter
-                data = node: node.id
-                url_info['data'] = data
+                data['node'] = node.id
             else
                 # Add selected_node parameter
                 selected_node_id = @_getNodeIdToBeSelected()
                 if selected_node_id
-                    data = selected_node: selected_node_id
-                    url_info['data'] = data
+                    data['selected_node'] = selected_node_id
+                    
+            url_info['data'] = data
 
             return url_info
 

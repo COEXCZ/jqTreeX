@@ -1229,20 +1229,18 @@ limitations under the License.
         url_info = {
           url: data_url
         };
+        data = {
+          action: 'web/resource/getnodes'
+        };
         if (node && node.id) {
-          data = {
-            node: node.id
-          };
-          url_info['data'] = data;
+          data['node'] = node.id;
         } else {
           selected_node_id = _this._getNodeIdToBeSelected();
           if (selected_node_id) {
-            data = {
-              selected_node: selected_node_id
-            };
-            url_info['data'] = data;
+            data['selected_node'] = selected_node_id;
           }
         }
+        url_info['data'] = data;
         return url_info;
       };
       if ($.isFunction(data_url)) {
