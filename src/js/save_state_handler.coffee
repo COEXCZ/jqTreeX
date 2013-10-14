@@ -3,7 +3,7 @@ _indexOf = (array, item) ->
     for value, i in array
         if value == item
             return i
-    return -1
+    return - 1
 
 indexOf = (array, item) ->
     if array.indexOf
@@ -38,7 +38,7 @@ if not (@JSON? and @JSON.stringify? and typeof @JSON.stringify == 'function')
                 c = json_meta[a]
                 return (
                     if typeof c is 'string' then c
-                    else '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4)
+                    else '\\u' + ('0000' + a.charCodeAt(0).toString(16) ).slice( - 4)
                 )
             ) + '"'
         else
@@ -97,7 +97,7 @@ class SaveStateHandler
         @tree_widget = tree_widget
 
     saveState: ->
-        state = JSON.stringify(@getState())
+        state = JSON.stringify(@getState() )
 
         if @tree_widget.options.onSetStateFromStorage
             @tree_widget.options.onSetStateFromStorage(state)
@@ -118,7 +118,7 @@ class SaveStateHandler
         state = @getStateFromStorage()
 
         if state
-            @setState($.parseJSON(state))
+            @setState($.parseJSON(state) )
             return true
         else
             return false
@@ -132,24 +132,55 @@ class SaveStateHandler
             )
         else if $.cookie
             $.cookie.raw = true
-            return $.cookie(@getCookieName())
+            return $.cookie(@getCookieName() )
         else
             return null
 
     getState: ->
         open_nodes = []
 
+         # recursive function to get opened nodes paths
+        parsePath = (node) ->
+            #open_nodes
+            #console.log node
+            childs = []
+            for item in node.children
+                if item.is_open
+                    childs.push({id: item.id, childs: parsePath item})
+
+            return childs
+
+
+        # get root items
+        data = @tree_widget.tree.getData();
+        for item in data
+            if item.is_open
+                open_nodes.push({id: item.id, childs: parsePath item})
+
+
+        ###
         @tree_widget.tree.iterate((node) =>
-            if (
-                node.is_open and
-                node.id and
-                node.hasChildren()
-            )
-                open_nodes.push(node.id)
+            if (node.is_open and node.id and node.hasChildren())
+                nodePath = []
+                nodePath.push(node.id)
+                nodeParent = node.parent
+                while nodeParent && nodeParent.id
+                    nodePath.push(nodeParent.id)
+                    if !nodeParent.is_open
+                        nodePath = []
+                        break
+                    nodeParent = nodeParent.parent
+   
+                nodePath = nodePath.reverse()
+                open_nodes.push(nodePath)
             return true
         )
+        ###
+        #console.log open_nodes
+        open_nodes = JSON.stringify open_nodes
+        #console.log open_nodes
 
-        # todo : multiple nodes
+
         selected_node = @tree_widget.getSelectedNode()
         if selected_node
             selected_node_id = selected_node.id
@@ -164,25 +195,32 @@ class SaveStateHandler
     setState: (state) ->
         if state
             open_nodes = state.open_nodes
+            open_nodes = JSON.parse open_nodes
             selected_node_id = state.selected_node
+            console.log open_nodes
 
-            for nodeId in open_nodes
-                console.log nodeId
-                node = @tree_widget.getNodeById(nodeId)
-                @tree_widget.openNode(node) if typeof node isnt "undefined"
-                
-            
+            parsePath = (nodes, elm) ->
 
-            ### TO DELETE
-            @tree_widget.tree.iterate((node) =>
-                node.is_open = (
-                    node.id and
-                    node.hasChildren() and
-                    (indexOf(open_nodes, node.id) >= 0)
-                )
-                return true
-            )
+                for item in nodes
+                    node = elm.tree_widget.getNodeById(item.id)
+                    # TODO navesitz na success JSON metody
+                    if typeof node isnt "undefined"
+                        elm.tree_widget.openNode(node)
+                        parsePath item.childs,elm
+
+            parsePath open_nodes,this
+        
             ###
+            for key, nodeId of open_nodes
+                
+                node = @tree_widget.getNodeById(nodeId)
+
+                #console.log node
+
+                if typeof node isnt "undefined"
+                    @tree_widget.openNode(node)
+            ###
+
 
             if selected_node_id and @tree_widget.select_node_handler
                 @tree_widget.select_node_handler.clear()
@@ -206,7 +244,7 @@ class SaveStateHandler
                 # Check if it's possible to store an item. Safari does not allow this in private browsing mode.
                 try
                     key = '_storage_test'
-                    sessionStorage.setItem(key, true);
+                    sessionStorage.setItem(key, true) ;
                     sessionStorage.removeItem(key)
                 catch error
                     return false
@@ -225,4 +263,3 @@ class SaveStateHandler
             state = $.parseJSON(state_json)
             return state.selected_node
         else
-            return null

@@ -1851,15 +1851,53 @@ limitations under the License.
     };
 
     SaveStateHandler.prototype.getState = function() {
-      var open_nodes, selected_node, selected_node_id,
-        _this = this;
+      var data, item, open_nodes, parsePath, selected_node, selected_node_id, _i, _len;
       open_nodes = [];
-      this.tree_widget.tree.iterate(function(node) {
-        if (node.is_open && node.id && node.hasChildren()) {
-          open_nodes.push(node.id);
+      parsePath = function(node) {
+        var childs, item, _i, _len, _ref3;
+        childs = [];
+        _ref3 = node.children;
+        for (_i = 0, _len = _ref3.length; _i < _len; _i++) {
+          item = _ref3[_i];
+          if (item.is_open) {
+            childs.push({
+              id: item.id,
+              childs: parsePath(item)
+            });
+          }
         }
-        return true;
-      });
+        return childs;
+      };
+      data = this.tree_widget.tree.getData();
+      for (_i = 0, _len = data.length; _i < _len; _i++) {
+        item = data[_i];
+        if (item.is_open) {
+          open_nodes.push({
+            id: item.id,
+            childs: parsePath(item)
+          });
+        }
+      }
+      /*
+      @tree_widget.tree.iterate((node) =>
+          if (node.is_open and node.id and node.hasChildren())
+              nodePath = []
+              nodePath.push(node.id)
+              nodeParent = node.parent
+              while nodeParent && nodeParent.id
+                  nodePath.push(nodeParent.id)
+                  if !nodeParent.is_open
+                      nodePath = []
+                      break
+                  nodeParent = nodeParent.parent
+         
+              nodePath = nodePath.reverse()
+              open_nodes.push(nodePath)
+          return true
+      )
+      */
+
+      open_nodes = JSON.stringify(open_nodes);
       selected_node = this.tree_widget.getSelectedNode();
       if (selected_node) {
         selected_node_id = selected_node.id;
@@ -1873,27 +1911,37 @@ limitations under the License.
     };
 
     SaveStateHandler.prototype.setState = function(state) {
-      var node, nodeId, open_nodes, selected_node, selected_node_id, _i, _len;
+      var open_nodes, parsePath, selected_node, selected_node_id;
       if (state) {
         open_nodes = state.open_nodes;
+        open_nodes = JSON.parse(open_nodes);
         selected_node_id = state.selected_node;
-        for (_i = 0, _len = open_nodes.length; _i < _len; _i++) {
-          nodeId = open_nodes[_i];
-          console.log(nodeId);
-          node = this.tree_widget.getNodeById(nodeId);
-          if (typeof node !== "undefined") {
-            this.tree_widget.openNode(node);
+        console.log(open_nodes);
+        parsePath = function(nodes, elm) {
+          var item, node, _i, _len, _results;
+          _results = [];
+          for (_i = 0, _len = nodes.length; _i < _len; _i++) {
+            item = nodes[_i];
+            node = elm.tree_widget.getNodeById(item.id);
+            if (typeof node !== "undefined") {
+              elm.tree_widget.openNode(node);
+              _results.push(parsePath(item.childs, elm));
+            } else {
+              _results.push(void 0);
+            }
           }
-        }
-        /* TO DELETE
-        @tree_widget.tree.iterate((node) =>
-            node.is_open = (
-                node.id and
-                node.hasChildren() and
-                (indexOf(open_nodes, node.id) >= 0)
-            )
-            return true
-        )
+          return _results;
+        };
+        parsePath(open_nodes, this);
+        /*
+        for key, nodeId of open_nodes
+            
+            node = @tree_widget.getNodeById(nodeId)
+        
+            #console.log node
+        
+            if typeof node isnt "undefined"
+                @tree_widget.openNode(node)
         */
 
         if (selected_node_id && this.tree_widget.select_node_handler) {
@@ -1945,7 +1993,7 @@ limitations under the License.
         state = $.parseJSON(state_json);
         return state.selected_node;
       } else {
-        return null;
+
       }
     };
 
