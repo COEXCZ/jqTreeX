@@ -744,7 +744,7 @@ class FolderElement extends NodeElement
 
             doOpen = =>
                 @getLi().removeClass('jqtree-closed')
-                if on_finished
+                if on_finished and $.isFunction(on_finished)
                     on_finished()
 
                 @tree_widget._triggerEvent('tree.open', node: @node)

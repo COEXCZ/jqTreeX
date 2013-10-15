@@ -3,6 +3,9 @@ ul {
     	list-style: none;
     	margin: 0;
     	padding: 0;
+        position: relative;
+        z-index: 1000;
+
 
     	ul {
             position: relative;
@@ -119,3 +122,17 @@ span.jqtree-dragging {
     cursor: pointer;
     padding: 2px 8px;
 }
+
+.contextmenu {
+    width: 200px;
+    height: auto;
+    padding: 5px;
+    background: red;
+    position: absolute;
+    z-index: 10000;
+    top: 0px;
+    left: 10px;
+
+    box-shadow: 0 0 3px 0 rgba(0,0,0,0.5);
+}
+

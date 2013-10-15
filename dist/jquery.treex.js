@@ -1650,7 +1650,7 @@ limitations under the License.
         $button.html(this.tree_widget.options.openedIcon);
         doOpen = function() {
           _this.getLi().removeClass('jqtree-closed');
-          if (on_finished) {
+          if (on_finished && $.isFunction(on_finished)) {
             on_finished();
           }
           return _this.tree_widget._triggerEvent('tree.open', {
@@ -1878,7 +1878,9 @@ limitations under the License.
           });
         }
       }
+      open_nodes = JSON.stringify(open_nodes);
       /*
+       # old engine for open nodes saving action
       @tree_widget.tree.iterate((node) =>
           if (node.is_open and node.id and node.hasChildren())
               nodePath = []
@@ -1897,7 +1899,6 @@ limitations under the License.
       )
       */
 
-      open_nodes = JSON.stringify(open_nodes);
       selected_node = this.tree_widget.getSelectedNode();
       if (selected_node) {
         selected_node_id = selected_node.id;
@@ -1914,18 +1915,17 @@ limitations under the License.
       var open_nodes, parsePath, selected_node, selected_node_id;
       if (state) {
         open_nodes = state.open_nodes;
+        console.log(open_nodes);
         open_nodes = JSON.parse(open_nodes);
         selected_node_id = state.selected_node;
-        console.log(open_nodes);
         parsePath = function(nodes, elm) {
-          var item, node, _i, _len, _results;
+          var item, node, slide, _i, _len, _results;
           _results = [];
           for (_i = 0, _len = nodes.length; _i < _len; _i++) {
             item = nodes[_i];
             node = elm.tree_widget.getNodeById(item.id);
             if (typeof node !== "undefined") {
-              elm.tree_widget.openNode(node);
-              _results.push(parsePath(item.childs, elm));
+              _results.push(elm.tree_widget._openNode(node, slide = true, parsePath(item.childs, elm)));
             } else {
               _results.push(void 0);
             }
@@ -1934,6 +1934,7 @@ limitations under the License.
         };
         parsePath(open_nodes, this);
         /*
+        # old engine for open nodes loading action
         for key, nodeId of open_nodes
             
             node = @tree_widget.getNodeById(nodeId)

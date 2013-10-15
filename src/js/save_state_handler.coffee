@@ -155,10 +155,13 @@ class SaveStateHandler
         data = @tree_widget.tree.getData();
         for item in data
             if item.is_open
+                # get tree of opened nodes
                 open_nodes.push({id: item.id, childs: parsePath item})
-
+        # serialize tree of nodes
+        open_nodes = JSON.stringify open_nodes
 
         ###
+         # old engine for open nodes saving action
         @tree_widget.tree.iterate((node) =>
             if (node.is_open and node.id and node.hasChildren())
                 nodePath = []
@@ -176,10 +179,6 @@ class SaveStateHandler
             return true
         )
         ###
-        #console.log open_nodes
-        open_nodes = JSON.stringify open_nodes
-        #console.log open_nodes
-
 
         selected_node = @tree_widget.getSelectedNode()
         if selected_node
@@ -195,22 +194,25 @@ class SaveStateHandler
     setState: (state) ->
         if state
             open_nodes = state.open_nodes
+            console.log open_nodes
             open_nodes = JSON.parse open_nodes
             selected_node_id = state.selected_node
-            console.log open_nodes
 
+            # recursive function that parses nodes to opened node
             parsePath = (nodes, elm) ->
 
                 for item in nodes
                     node = elm.tree_widget.getNodeById(item.id)
-                    # TODO navesitz na success JSON metody
+
                     if typeof node isnt "undefined"
-                        elm.tree_widget.openNode(node)
-                        parsePath item.childs,elm
+                        elm.tree_widget._openNode(node, slide=true, parsePath item.childs,elm)
+                        #elm.tree_widget._openNode(node, slide=true)
+                        #parsePath item.childs,elm
 
             parsePath open_nodes,this
         
             ###
+            # old engine for open nodes loading action
             for key, nodeId of open_nodes
                 
                 node = @tree_widget.getNodeById(nodeId)
