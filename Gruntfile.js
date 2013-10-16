@@ -41,7 +41,8 @@ module.exports = function(grunt) {
 		coffee: {
 			compile: {
                 options: {
-                    join: true
+                    join: true,
+                    sourceMap: true
                 },
 				files: {
 					"dist/jquery.treex.js": ['src/js/simple.widget.coffee', 'src/js/mouse.widget.coffee', 'src/js/node.coffee',  'src/js/tree.jquery.coffee', 'src/js/save_state_handler.coffee', 'src/js/select_node_handler.coffee', 'src/js/drag_and_drop_handler.coffee', 'src/js/scroll_handler.coffee', 'src/js/key_handler.coffee']
