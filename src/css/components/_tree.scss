@@ -127,12 +127,14 @@ span.jqtree-dragging {
     width: 200px;
     height: auto;
     padding: 5px;
-    background: red;
+    background: #eee;
+    border: solid #aaa 1px;
     position: absolute;
     z-index: 10000;
     /*top: 0px;
     left: 10px;*/
 
+    border-radius: 2px;
     box-shadow: 0 0 3px 0 rgba(0,0,0,0.5);
 }
 
