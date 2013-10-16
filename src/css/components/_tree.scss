@@ -126,7 +126,7 @@ span.jqtree-dragging {
 .contextmenu {
     width: 200px;
     height: auto;
-    padding: 5px;
+    padding: 5px 10px;
     background: #eee;
     border: solid #aaa 1px;
     position: absolute;
@@ -136,5 +136,9 @@ span.jqtree-dragging {
 
     border-radius: 2px;
     box-shadow: 0 0 3px 0 rgba(0,0,0,0.5);
+
+    a {
+        color: #333;
+    }
 }
 
