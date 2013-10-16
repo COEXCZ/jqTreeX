@@ -1,3 +1,4 @@
+//@ sourceMappingURL=jquery.treex.map
 /*
 Copyright 2013 Marco Braak
 
@@ -1918,25 +1919,22 @@ limitations under the License.
         open_nodes = JSON.parse(open_nodes);
         selected_node_id = state.selected_node;
         parsePath = function(nodes, elm) {
-          var item, node, slide, _i, _len, _results;
+          var item, node, _i, _len, _results;
           _results = [];
           for (_i = 0, _len = nodes.length; _i < _len; _i++) {
             item = nodes[_i];
-            node = elm.getNodeById(item.id);
-            /*
-            console.log item.id
-            console.log node
-            */
-
+            node = elm.tree_widget.getNodeById(item.id);
             if (typeof node !== "undefined") {
-              _results.push(elm._openNode(node, slide = true, parsePath(item.childs, elm)));
+              _results.push(elm.tree_widget._openNode(node, true, function() {
+                return parsePath(item.childs, elm);
+              }));
             } else {
               _results.push(void 0);
             }
           }
           return _results;
         };
-        parsePath(open_nodes, this.tree_widget);
+        parsePath(open_nodes, this);
         /*
         # old engine for open nodes loading action
         for key, nodeId of open_nodes
