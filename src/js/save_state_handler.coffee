@@ -3,7 +3,7 @@ _indexOf = (array, item) ->
     for value, i in array
         if value == item
             return i
-    return - 1
+    return -1
 
 indexOf = (array, item) ->
     if array.indexOf
@@ -201,19 +201,14 @@ class SaveStateHandler
             parsePath = (nodes, elm) ->
 
                 for item in nodes
-                    node = elm.getNodeById(item.id)
-                    ###
-                    console.log item.id
-                    console.log node
-                    ###
-                    
+                    node = elm.tree_widget.getNodeById(item.id)
+
                     if typeof node isnt "undefined"
-                        
-                        elm._openNode(node, slide=true, parsePath item.childs,elm)
+                        elm.tree_widget._openNode(node, true, -> parsePath item.childs,elm)
                         #elm.tree_widget._openNode(node, slide=true)
                         #parsePath item.childs,elm
 
-            parsePath open_nodes,@tree_widget
+            parsePath open_nodes,this
         
             ###
             # old engine for open nodes loading action
