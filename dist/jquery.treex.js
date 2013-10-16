@@ -1915,7 +1915,6 @@ limitations under the License.
       var open_nodes, parsePath, selected_node, selected_node_id;
       if (state) {
         open_nodes = state.open_nodes;
-        console.log(open_nodes);
         open_nodes = JSON.parse(open_nodes);
         selected_node_id = state.selected_node;
         parsePath = function(nodes, elm) {
@@ -1923,16 +1922,21 @@ limitations under the License.
           _results = [];
           for (_i = 0, _len = nodes.length; _i < _len; _i++) {
             item = nodes[_i];
-            node = elm.tree_widget.getNodeById(item.id);
+            node = elm.getNodeById(item.id);
+            /*
+            console.log item.id
+            console.log node
+            */
+
             if (typeof node !== "undefined") {
-              _results.push(elm.tree_widget._openNode(node, slide = true, parsePath(item.childs, elm)));
+              _results.push(elm._openNode(node, slide = true, parsePath(item.childs, elm)));
             } else {
               _results.push(void 0);
             }
           }
           return _results;
         };
-        parsePath(open_nodes, this);
+        parsePath(open_nodes, this.tree_widget);
         /*
         # old engine for open nodes loading action
         for key, nodeId of open_nodes

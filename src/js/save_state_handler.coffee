@@ -194,7 +194,6 @@ class SaveStateHandler
     setState: (state) ->
         if state
             open_nodes = state.open_nodes
-            console.log open_nodes
             open_nodes = JSON.parse open_nodes
             selected_node_id = state.selected_node
 
@@ -202,14 +201,19 @@ class SaveStateHandler
             parsePath = (nodes, elm) ->
 
                 for item in nodes
-                    node = elm.tree_widget.getNodeById(item.id)
-
+                    node = elm.getNodeById(item.id)
+                    ###
+                    console.log item.id
+                    console.log node
+                    ###
+                    
                     if typeof node isnt "undefined"
-                        elm.tree_widget._openNode(node, slide=true, parsePath item.childs,elm)
+                        
+                        elm._openNode(node, slide=true, parsePath item.childs,elm)
                         #elm.tree_widget._openNode(node, slide=true)
                         #parsePath item.childs,elm
 
-            parsePath open_nodes,this
+            parsePath open_nodes,@tree_widget
         
             ###
             # old engine for open nodes loading action
