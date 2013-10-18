@@ -194,7 +194,12 @@ class SaveStateHandler
     setState: (state) ->
         if state
             open_nodes = state.open_nodes
-            open_nodes = JSON.parse open_nodes
+
+            try
+                open_nodes = JSON.parse open_nodes
+            catch error
+                
+
             selected_node_id = state.selected_node
 
             # recursive function that parses nodes to opened node
