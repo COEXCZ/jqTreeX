@@ -77,6 +77,10 @@ ul {
 
             .jqtree-title {
                 cursor: pointer;
+
+                &.unpublished {
+                    font-style: italic;
+                }
             }
         }        
 
