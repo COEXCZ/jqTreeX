@@ -111,6 +111,19 @@ ul {
             }            
         }
 
+
+
+
+        .jqtree-loading {
+            &>div {
+                .jqtree-title:after {
+                    content: url("i/spinner.gif");
+                    margin-left: 8px;
+                }
+            }
+        }
+
+
     }
 }
 
