@@ -995,11 +995,11 @@ limitations under the License.
       return this.tree.getNodeByName(name);
     };
 
-    JqTreeWidget.prototype.openNode = function(node, slide) {
+    JqTreeWidget.prototype.openNode = function(node, slide, on_finished) {
       if (slide == null) {
         slide = true;
       }
-      return this._openNode(node, slide);
+      return this._openNode(node, slide, on_finished);
     };
 
     JqTreeWidget.prototype._openNode = function(node, slide, on_finished) {
@@ -1913,7 +1913,7 @@ limitations under the License.
     };
 
     SaveStateHandler.prototype.setState = function(state) {
-      var error, open_nodes, parsePath, selected_node, selected_node_id;
+      var elm, error, open_nodes, parsePath, selected_node, selected_node_id;
       if (state) {
         open_nodes = state.open_nodes;
         try {
@@ -1922,7 +1922,8 @@ limitations under the License.
           error = _error;
         }
         selected_node_id = state.selected_node;
-        parsePath = function(nodes, elm) {
+        elm = this;
+        parsePath = function(nodes) {
           var item, node, _i, _len, _results;
           _results = [];
           for (_i = 0, _len = nodes.length; _i < _len; _i++) {
@@ -1930,7 +1931,7 @@ limitations under the License.
             node = elm.tree_widget.getNodeById(item.id);
             if (typeof node !== "undefined") {
               _results.push(elm.tree_widget._openNode(node, true, function() {
-                return parsePath(item.childs, elm);
+                return parsePath(item.childs);
               }));
             } else {
               _results.push(void 0);
@@ -1938,7 +1939,7 @@ limitations under the License.
           }
           return _results;
         };
-        parsePath(open_nodes, this);
+        parsePath(open_nodes);
         /*
         # old engine for open nodes loading action
         for key, nodeId of open_nodes

@@ -837,8 +837,8 @@ class JqTreeWidget extends MouseWidget
     getNodeByName: (name) ->
         return @tree.getNodeByName(name)
 
-    openNode: (node, slide=true) ->
-        @_openNode(node, slide)
+    openNode: (node, slide=true, on_finished) ->
+        @_openNode(node, slide, on_finished)
 
     _openNode: (node, slide=true, on_finished) ->
         doOpenNode = (_node, _slide, _on_finished) =>
@@ -1637,17 +1637,16 @@ class SaveStateHandler
             selected_node_id = state.selected_node
 
             # recursive function that parses nodes to opened node
-            parsePath = (nodes, elm) ->
+            elm = this
+            parsePath = (nodes) ->
 
                 for item in nodes
                     node = elm.tree_widget.getNodeById(item.id)
-
                     if typeof node isnt "undefined"
-                        elm.tree_widget._openNode(node, true, -> parsePath item.childs,elm)
-                        #elm.tree_widget._openNode(node, slide=true)
-                        #parsePath item.childs,elm
+                        elm.tree_widget._openNode(node, true, -> parsePath item.childs)
 
-            parsePath open_nodes,this
+            parsePath open_nodes
+            # END recursive function that parses nodes to opened node
         
             ###
             # old engine for open nodes loading action

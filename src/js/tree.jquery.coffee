@@ -198,8 +198,8 @@ class JqTreeWidget extends MouseWidget
     getNodeByName: (name) ->
         return @tree.getNodeByName(name)
 
-    openNode: (node, slide=true) ->
-        @_openNode(node, slide)
+    openNode: (node, slide=true, on_finished) ->
+        @_openNode(node, slide, on_finished)
 
     _openNode: (node, slide=true, on_finished) ->
         doOpenNode = (_node, _slide, _on_finished) =>
