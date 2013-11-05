@@ -198,18 +198,15 @@ class SaveStateHandler
             try
                 open_nodes = JSON.parse open_nodes
             catch error
-                
 
             selected_node_id = state.selected_node
 
             # recursive function that parses nodes to opened node
-            elm = this
-            parsePath = (nodes) ->
-
+            parsePath = (nodes) =>
                 for item in nodes
-                    node = elm.tree_widget.getNodeById(item.id)
+                    node = @tree_widget.getNodeById(item.id)
                     if typeof node isnt "undefined"
-                        elm.tree_widget._openNode(node, true, -> parsePath item.childs)
+                        @tree_widget.myOpenNode(node, true, parsePath, item.childs)
 
             parsePath open_nodes
             # END recursive function that parses nodes to opened node

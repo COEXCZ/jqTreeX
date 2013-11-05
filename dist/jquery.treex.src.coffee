@@ -773,24 +773,26 @@ class JqTreeWidget extends MouseWidget
                 $el.removeClass('jqtree-loading')
 
         parseUrlInfo = =>
-            if $.type(url_info) == 'string'
-                url_info = url: url_info
+            if $.type(@._url_info) == 'string'
+              @._url_info = url: @._url_info
 
-            if not url_info.method
-                url_info.method = 'get'
+            if not @._url_info.method
+              @._url_info.method = 'get'
 
         addLoadingClass()
 
-        if not url_info
+        @._url_info = url_info
+
+        if not @._url_info
             # Generate url for node
-            url_info = @_getDataUrlInfo(parent_node)
+          @._url_info = @_getDataUrlInfo(parent_node)
 
         parseUrlInfo()
 
         $.ajax(
-            url: url_info.url
-            data: url_info.data
-            type: url_info.method.toUpperCase()
+            url: @._url_info.url
+            data: @._url_info.data
+            type: @._url_info.method.toUpperCase()
             cache: false
             dataType: 'json'
             success: (response) =>
@@ -839,6 +841,9 @@ class JqTreeWidget extends MouseWidget
 
     openNode: (node, slide=true, on_finished) ->
         @_openNode(node, slide, on_finished)
+
+    myOpenNode: (node, slide=true, on_finished, params) ->
+      @_openNode(node, slide, => on_finished(params))
 
     _openNode: (node, slide=true, on_finished) ->
         doOpenNode = (_node, _slide, _on_finished) =>
@@ -1632,18 +1637,15 @@ class SaveStateHandler
             try
                 open_nodes = JSON.parse open_nodes
             catch error
-                
 
             selected_node_id = state.selected_node
 
             # recursive function that parses nodes to opened node
-            elm = this
-            parsePath = (nodes) ->
-
+            parsePath = (nodes) =>
                 for item in nodes
-                    node = elm.tree_widget.getNodeById(item.id)
+                    node = @tree_widget.getNodeById(item.id)
                     if typeof node isnt "undefined"
-                        elm.tree_widget._openNode(node, true, -> parsePath item.childs)
+                        @tree_widget.myOpenNode(node, true, parsePath, item.childs)
 
             parsePath open_nodes
             # END recursive function that parses nodes to opened node

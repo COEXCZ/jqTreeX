@@ -920,24 +920,25 @@ limitations under the License.
         }
       };
       parseUrlInfo = function() {
-        if ($.type(url_info) === 'string') {
-          url_info = {
-            url: url_info
+        if ($.type(_this._url_info) === 'string') {
+          _this._url_info = {
+            url: _this._url_info
           };
         }
-        if (!url_info.method) {
-          return url_info.method = 'get';
+        if (!_this._url_info.method) {
+          return _this._url_info.method = 'get';
         }
       };
       addLoadingClass();
-      if (!url_info) {
-        url_info = this._getDataUrlInfo(parent_node);
+      this._url_info = url_info;
+      if (!this._url_info) {
+        this._url_info = this._getDataUrlInfo(parent_node);
       }
       parseUrlInfo();
       return $.ajax({
-        url: url_info.url,
-        data: url_info.data,
-        type: url_info.method.toUpperCase(),
+        url: this._url_info.url,
+        data: this._url_info.data,
+        type: this._url_info.method.toUpperCase(),
         cache: false,
         dataType: 'json',
         success: function(response) {
@@ -1000,6 +1001,16 @@ limitations under the License.
         slide = true;
       }
       return this._openNode(node, slide, on_finished);
+    };
+
+    JqTreeWidget.prototype.myOpenNode = function(node, slide, on_finished, params) {
+      var _this = this;
+      if (slide == null) {
+        slide = true;
+      }
+      return this._openNode(node, slide, function() {
+        return on_finished(params);
+      });
     };
 
     JqTreeWidget.prototype._openNode = function(node, slide, on_finished) {
@@ -1913,7 +1924,8 @@ limitations under the License.
     };
 
     SaveStateHandler.prototype.setState = function(state) {
-      var elm, error, open_nodes, parsePath, selected_node, selected_node_id;
+      var error, open_nodes, parsePath, selected_node, selected_node_id,
+        _this = this;
       if (state) {
         open_nodes = state.open_nodes;
         try {
@@ -1922,17 +1934,14 @@ limitations under the License.
           error = _error;
         }
         selected_node_id = state.selected_node;
-        elm = this;
         parsePath = function(nodes) {
           var item, node, _i, _len, _results;
           _results = [];
           for (_i = 0, _len = nodes.length; _i < _len; _i++) {
             item = nodes[_i];
-            node = elm.tree_widget.getNodeById(item.id);
+            node = _this.tree_widget.getNodeById(item.id);
             if (typeof node !== "undefined") {
-              _results.push(elm.tree_widget._openNode(node, true, function() {
-                return parsePath(item.childs);
-              }));
+              _results.push(_this.tree_widget.myOpenNode(node, true, parsePath, item.childs));
             } else {
               _results.push(void 0);
             }
