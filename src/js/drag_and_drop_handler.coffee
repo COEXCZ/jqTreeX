@@ -6,6 +6,7 @@ class DragAndDropHandler
         @$ghost = null
         @hit_areas = []
         @is_dragging = false
+        @current_item = null
 
     mouseCapture: (position_info) ->
         $element = $(position_info.target)
@@ -23,7 +24,7 @@ class DragAndDropHandler
         return (@current_item != null)
 
     mouseStart: (position_info) ->
-        @refreshHitAreas()
+        @refresh()
 
         offset = $(position_info.target).offset()
 
@@ -44,7 +45,7 @@ class DragAndDropHandler
         area = @findHoveredArea(position_info.page_x, position_info.page_y)
         can_move_to = @canMoveToArea(area)
 
-        if area
+        if can_move_to and area
             if @hovered_area != area
                 @hovered_area = area
 
@@ -52,8 +53,7 @@ class DragAndDropHandler
                 if @mustOpenFolderTimer(area)
                     @startOpenFolderTimer(area.node)
 
-                if can_move_to
-                    @updateDropHint()
+                @updateDropHint()
         else
             @removeHover()
             @removeDropHint()
@@ -80,13 +80,20 @@ class DragAndDropHandler
 
         if @current_item
             @current_item.$element.removeClass('jqtree-moving')
+            @current_item = null
 
         @is_dragging = false
         return false
 
-    refreshHitAreas: ->
+    refresh: ->
         @removeHitAreas()
         @generateHitAreas()
+
+        if @current_item
+            @current_item = @tree_widget._getNodeElementForNode(@current_item.node)
+
+            if @is_dragging
+                @current_item.$element.addClass('jqtree-moving')
 
     removeHitAreas: ->
         @hit_areas = []
@@ -162,11 +169,13 @@ class DragAndDropHandler
                 folder,
                 @tree_widget.options.slide,
                 =>
-                    @refreshHitAreas()
+                    @refresh()
                     @updateDropHint()
             )
 
-        @open_folder_timer = setTimeout(openFolder, 500)
+        @stopOpenFolderTimer()
+
+        @open_folder_timer = setTimeout(openFolder, @tree_widget.options.openFolderDelay)
 
     stopOpenFolderTimer: ->
         if @open_folder_timer
@@ -216,6 +225,7 @@ class DragAndDropHandler
             right: offset.left + @tree_widget.element.width(),
             bottom: offset.top + @tree_widget.element.height() + 16
         }
+
 
 class VisibleNodeIterator
     constructor: (tree) ->
@@ -298,11 +308,13 @@ class HitAreasGenerator extends VisibleNodeIterator
         return $element.offset().top
 
     addPosition: (node, position, top) ->
-        @positions.push(
-            top: top,
-            node: node,
-            position: position
-        )
+        area = {
+            top: top
+            node: node
+            position: position            
+        }
+
+        @positions.push(area)
         @last_top = top
 
     handleNode: (node, next_node, $element) ->
@@ -349,19 +361,19 @@ class HitAreasGenerator extends VisibleNodeIterator
             if next_node != @current_node
                 @addPosition(node, Position.AFTER, top)
 
+    handleFirstNode: (node, $element) ->
+        if node != @current_node
+            @addPosition(node, Position.BEFORE, @getTop($(node.element)))
+
     handleAfterOpenFolder: (node, next_node, $element) ->
         if (
-            node == @current_node or
-            next_node == @current_node
+            node == @current_node.node or
+            next_node == @current_node.node
         )
             # Cannot move before or after current item
             @addPosition(node, Position.NONE, @last_top)
         else
             @addPosition(node, Position.AFTER, @last_top)
-
-    handleFirstNode: (node, $element) ->
-        if node != @current_node
-            @addPosition(node, Position.BEFORE, @getTop($(node.element)))
 
     generateHitAreas: (positions) ->
         previous_top = -1
@@ -393,10 +405,16 @@ class HitAreasGenerator extends VisibleNodeIterator
         return hit_areas
 
     generateHitAreasForGroup: (hit_areas, positions_in_group, top, bottom) ->
-        area_height = (bottom - top) / positions_in_group.length
+        # limit positions in group
+        position_count = Math.min(positions_in_group.length, 4)
+
+        area_height = Math.round((bottom - top) / position_count)
         area_top = top
 
-        for position in positions_in_group
+        i = 0
+        while (i < position_count)
+            position = positions_in_group[i]
+
             hit_areas.push(
                 top: area_top,
                 bottom: area_top + area_height,
@@ -405,9 +423,9 @@ class HitAreasGenerator extends VisibleNodeIterator
             )
 
             area_top += area_height
+            i += 1
+
         return null
-
-
 
 
 class DragElement
@@ -471,10 +489,10 @@ class BorderDropHint
         @$hint = $('<span class="jqtree-border"></span>')
         $div.append(@$hint)
 
-        @$hint.css({
-            width: width,
+        @$hint.css(
+            width: width
             height: $div.height() - 4
-        })
+        )
 
     remove: ->
         @$hint.remove()
